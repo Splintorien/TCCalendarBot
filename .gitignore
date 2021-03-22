@@ -1,0 +1,12 @@
+# Env file
+.env
+
+# IDE setting files
+.idea
+.vscode
+
+# Python cache
+**/__pycache__/
+
+# Calendars
+cogs/calendar/Assets
