@@ -1,0 +1,4 @@
+discord.py==1.6.0
+icalendar==4.0.7
+pylint==2.7.2
+requests==2.25.1
