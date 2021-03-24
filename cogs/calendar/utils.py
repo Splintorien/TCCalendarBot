@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from icalendar import Calendar
 
+import copy
 import discord
 import time
 import os
@@ -9,12 +10,7 @@ import requests
 CALENDAR_PATH = "cogs/calendar/Assets/3TCA.ical"
 WEEKDAYS = {1: "Lundi", 2: "Mardi", 3: "Mercredi", 4: "Jeudi", 5: "Vendredi"}
 RESPONSE_TEMPLATE = """{starting_time}:00 - {end_time}:00 :: {course} at {location} | {details}"""
-COURSE_COMMENT = {
-    "TSA": "\U0001F972",
-    "CMN": "\N{CRYING FACE}",
-    "PPC": "\N{Face with Party Horn and Party Hat}",
-    "WEB": "\N{Face with Party Horn and Party Hat}"
-}
+COURSE_COMMENT = {}
 DETAILS_COMMENT = {"Image": "ui"}
 
 
@@ -68,9 +64,7 @@ def format_response(course, template=RESPONSE_TEMPLATE):
         end_time = format_time(course, 'DTEND')
         current_course = format_course(course)
         location = format_location(course)
-        print("crash 5")
         details = format_details(course)
-        print("crash 6")
         return template.format(
             starting_time=starting_time,
             end_time=end_time,
@@ -115,7 +109,7 @@ def format_location(course):
     Format the course location displayed
     """
     if "Distanciel" in course['LOCATION']:
-        return "Pepouze dans le siège"
+        return "Distanciel"
     return course['LOCATION']
 
 
@@ -159,21 +153,41 @@ def download_calendar():
             time.sleep(1)
 
 
-def get_week_calendar(calendar_path=CALENDAR_PATH, offset=0, dobby=None):
+def get_week_calendar(calendar_path=CALENDAR_PATH, offset=0, dobby=None, group_displayed="3TCA"):
     """
     Get the calendar of a week
     """
     current_weekday = datetime.today().isoweekday()
     week_calendar = {}
+    calendar = discord.Embed()
+    calendar.description= "Calendrier des " + group_displayed
+    weekdays_with_date = {}
+
     for day_index in range(0, current_weekday):
         day = datetime.today() - timedelta(days=day_index) + timedelta(days=offset * 7)
+
+        if day_index + 1 in WEEKDAYS:
+            weekdays_with_date[day_index + 1] = WEEKDAYS[day_index + 1] + " " + str(day.day) + "/" + str(day.month)
+        if day_index == 0:
+            calendar.title = "Semaine du " + str(day.day) + "/" + str(day.month)
+
         week_calendar[current_weekday - day_index] = get_course_by_date(
             prompt_date=day.date(),
             calendar_path=calendar_path
         )
+
     for day_index in range(current_weekday, 6):
         day = datetime.today() + timedelta(days=day_index + 1 - current_weekday) + timedelta(days=offset * 7)
-        week_calendar[day_index + 1] = get_course_by_date(prompt_date=day.date(), calendar_path=calendar_path)
+        if day_index + 1 in WEEKDAYS:
+            weekdays_with_date[day_index + 1] = WEEKDAYS[day_index + 1] + " " + str(day.day) + '/' + str(day.month)
+        if day_index == 0:
+            calendar.title = "Semaine du " + str(day.day) + "/" + str(day.month)
+
+        week_calendar[day_index + 1] = get_course_by_date(
+            prompt_date=day.date(),
+            calendar_path=calendar_path
+        )
+
     for day_index in range(1, 7):
         formatted_courses = []
         is_4_hour_course = False
@@ -194,9 +208,12 @@ def get_week_calendar(calendar_path=CALENDAR_PATH, offset=0, dobby=None):
             if not is_changed:
                 formatted_courses.append(str(dobby))
         week_calendar[day_index] = formatted_courses
-    calendar = discord.Embed(title="CALENDAR", description="A random description")
     for day_index in range(1, 6):
-        calendar.add_field(name=WEEKDAYS[day_index], value=str('\n'.join(map(str, week_calendar[day_index]))))
+        calendar.add_field(
+            name=weekdays_with_date[day_index],
+            value=str('\n'.join(map(str, week_calendar[day_index]))),
+            inline=True
+        )
 
     return calendar
 

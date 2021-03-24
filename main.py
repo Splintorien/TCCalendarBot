@@ -29,10 +29,21 @@ async def on_message(message):
     Function executed on each message received
     """
     if not message.author.bot:
-        if message.content.lower() == "ping":
-            await message.channel.send("pong")
-            await bot.change_presence(activity=discord.Game(name="Ping-Ponging"))
-
+        print("message", message)
+        print("message content", message.content)
+        if "ping" in message.content.lower():
+            ping_channel = bot.get_channel(823567430033866793)
+            if  message.channel.name == "ping-pong":
+                if message.mentions:
+                    print("message mentions", message.mentions)
+                    for mention in message.mentions:
+                        print("mention", mention)
+                        await message.channel.send(f"pong <@{mention.id}>")
+                else:
+                    await message.channel.send("pong")
+                await bot.change_presence(activity=discord.Game(name="Ping-Ponging"))
+            else:
+                await ping_channel.send(f"<@{message.author.id}> it is forbidden to play ping outside the court \N{ANGRY FACE}. Go to <#823567430033866793>")
         if message.content.lower().replace(" ", "") in ["tccalendarbot"] or bot.user in message.mentions:
             await message.channel.send("Hello, I am a calendar! :eyes: <:dobby:823315794472730655>\n")
 

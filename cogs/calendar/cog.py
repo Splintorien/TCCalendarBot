@@ -46,7 +46,10 @@ class CogCalendar(commands.Cog):
 
         if re.match(r"(([34])(TC|tc|Tc|tC)([123Aa])|([5])(TC|tc|Tc|tC)([123]))", arg):
             await self.bot.change_presence(
-                activity=discord.Activity(name=f"Calendrier des {arg}", type=discord.ActivityType.watching)
+                activity=discord.Activity(
+                    name=f"Calendrier des {arg}",
+                    type=discord.ActivityType.watching
+                )
             )
             year = arg[0]
             if arg[-1].isnumeric():
@@ -55,9 +58,14 @@ class CogCalendar(commands.Cog):
                 group = "A"
             calendar_path = ROOT_CALENDAR + f"/{year}TC{group}.ical"
             offset = get_offset(offset)
-            calendar = get_week_calendar(calendar_path=calendar_path, offset=offset, dobby=self.dobby)
+            calendar = get_week_calendar(
+                calendar_path=calendar_path,
+                offset=offset,
+                dobby=self.dobby,
+                group_displayed=year + "TC" + group
+            )
             await ctx.send(
-                content="@Reynald Lambolez#1305 pour que tu ne sois pas en retard...",
+                content="<@629369223377977364> pour que tu ne sois pas en retard...",
                 embed=calendar
             )
         else:
@@ -70,7 +78,10 @@ class CogCalendar(commands.Cog):
         """
         if re.match(r"(([34])(TC|tc|Tc|tC)([123Aa])|([5])(TC|tc|Tc|tC)([123]))", arg):
             await self.bot.change_presence(
-                activity=discord.Activity(name=f"Calendrier des {arg}", type=discord.ActivityType.watching)
+                activity=discord.Activity(
+                    name=f"Calendrier des {arg}",
+                    type=discord.ActivityType.watching
+                )
             )
 
             year = arg[0]
@@ -79,7 +90,7 @@ class CogCalendar(commands.Cog):
             else:
                 group = "A"
 
-            response = "@Reynald Lambolez#1305 pour que tu ne sois pas en retard...\n"
+            response = "<@629369223377977364> pour que tu ne sois pas en retard...\n"
             courses = get_course_by_date(
                 prompt_date=datetime.now().date(),
                 calendar_path=ROOT_CALENDAR + f"/{year}TC{group}.ical"
@@ -100,14 +111,17 @@ class CogCalendar(commands.Cog):
         """
         if re.match(r"(([34])(TC|tc|Tc|tC)([123Aa])|([5])(TC|tc|Tc|tC)([123]))", arg):
             await self.bot.change_presence(
-                activity=discord.Activity(name=f"Calendrier des {arg}", type=discord.ActivityType.watching)
+                activity=discord.Activity(
+                    name=f"Calendrier des {arg}",
+                    type=discord.ActivityType.watching
+                )
             )
             year = arg[0]
             if arg[-1].isnumeric():
                 group = arg[-1]
             else:
                 group = "A"
-            response = "@Reynald Lambolez#1305 pour que tu ne sois pas en retard...\n"
+            response = "<@629369223377977364> pour que tu ne sois pas en retard...\n"
             tomorrow = datetime.now() + timedelta(days=1)
             courses = get_course_by_date(
                 prompt_date=tomorrow.date(),
